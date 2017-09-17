@@ -7,9 +7,15 @@ require("hud.php");
 <select name="typ" onchange="updStatuscodes(this);">
 <?php
 $cats = sql::get("SELECT * FROM categories");
+$switch = false;
+$firstOption = null;
 foreach($cats as $v) {
 	echo "<option value=\"".$v["id"]."\">".ucfirst($v["namnsing"])."</option>
 ";
+	if($switch == false) {
+		$firstOption = $v["id"];
+		$switch = true;
+	}
 }
 ?>
 </select>
@@ -17,7 +23,7 @@ foreach($cats as $v) {
 function updStatuscodes(sel) {
 	var codes = [
 <?php
-$cats = sql::get("SELECT * FROM statuscodes");
+$cats = sql::get("SELECT * FROM statuscodes ORDER BY prio ASC");
 $switch = false;
 foreach($cats as $v) {
 	if($switch == true) {
@@ -42,16 +48,26 @@ foreach($cats as $v) {
 				}
 			}
 		}
-		console.log(c+": "+found);
+		//console.log(c+": "+found);
 		document.getElementById("status").children[c].hidden = found;
 		document.getElementById("status").children[c].disabled = found;
+	}
+	for(var c = 0; c < document.getElementById("status").children.length; c++) {
+		if(document.getElementById("status").children[c].hidden != true) {
+			document.getElementById("status").children[c].selected = true;
+			break;
+		}
 	}
 }
 </script>
 <select name="status" id="status">
 <?php
 foreach($cats as $v) {
-	echo "<option value=\"".$v["id"]."\">".ucfirst($v["name"])."</option>
+	$hidden = "";
+	if($v["cat"] != $firstOption) {
+		$hidden = " hidden='true'";
+	}
+	echo "<option value=\"".$v["id"]."\"".$hidden.">".ucfirst($v["name"])."</option>
 ";
 }
 ?>
